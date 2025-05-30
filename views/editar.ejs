@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Editar Gasto/Ingreso</title>
+</head>
+<body>
+  <h1>Editar Gasto/Ingreso</h1>
+
+  <form action="/gastos/editar/<%= gasto.id %>" method="POST">
+    <input type="text" name="descripcion" value="<%= gasto.descripcion %>" required>
+    <input type="number" step="0.01" name="monto" value="<%= gasto.monto %>" required>
+    <input type="text" name="categoria" value="<%= gasto.categoria %>" required>
+    <input type="date" name="fecha" value="<%= gasto.fecha %>" required>
+    <select name="tipo" required>
+      <option value="gasto" <% if(gasto.tipo === 'gasto') { %>selected<% } %>>Gasto</option>
+      <option value="ingreso" <% if(gasto.tipo === 'ingreso') { %>selected<% } %>>Ingreso</option>
+    </select>
+    <button type="submit">Guardar Cambios</button>
+  </form>
+
+  <a href="/gastos">Volver</a>
+</body>
+</html>
