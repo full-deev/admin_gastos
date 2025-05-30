@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const gastosRoutes = require('./routes/gastos');
+const PORT = process.env.PORT || 3000;
 
 // Middlewares
 app.use(express.urlencoded({ extended: true }));
@@ -19,6 +20,6 @@ app.get('/', (req, res) => {
 app.use('/gastos', gastosRoutes);
 
 // Servidor
-app.listen(3000, () => {
-  console.log('Servidor corriendo en http://localhost:3000');
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
