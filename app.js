@@ -2,7 +2,6 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const gastosRoutes = require('./routes/gastos');
-const PORT = process.env.PORT || 3000;
 
 // Middlewares
 app.use(express.urlencoded({ extended: true }));
@@ -16,10 +15,10 @@ app.set('view engine', 'ejs');
 app.get('/', (req, res) => {
   res.render('index');
 });
-
 app.use('/gastos', gastosRoutes);
 
 // Servidor
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });

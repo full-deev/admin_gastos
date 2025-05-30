@@ -1,67 +1,58 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../models/database');
+const pool = require('../models/database');
 
-// Mostrar lista de gastos
+// Mostrar todos los gastos
 router.get('/', (req, res) => {
-  db.all('SELECT * FROM gastos', (err, rows) => {
-    if (err) {
-      console.error(err);
-    } else {
-      res.render('gastos', { gastos: rows });
-    }
+  pool.query('SELECT * FROM gastos ORDER BY fecha DESC', (err, result) => {
+    if (err) console.error(err);
+    res.render('gastos', { gastos: result.rows });
   });
 });
 
-// Agregar gasto o ingreso
+// Agregar gasto/ingreso
 router.post('/', (req, res) => {
   const { descripcion, monto, categoria, fecha, tipo } = req.body;
-  db.run(`INSERT INTO gastos (descripcion, monto, categoria, fecha, tipo) VALUES (?, ?, ?, ?, ?)`,
+  pool.query(
+    'INSERT INTO gastos (descripcion, monto, categoria, fecha, tipo) VALUES ($1, $2, $3, $4, $5)',
     [descripcion, monto, categoria, fecha, tipo],
-    function (err) {
-      if (err) {
-        console.error(err);
-      }
+    (err) => {
+      if (err) console.error(err);
       res.redirect('/gastos');
-    });
+    }
+  );
 });
 
 // Eliminar
 router.get('/eliminar/:id', (req, res) => {
-  const id = req.params.id;
-  db.run(`DELETE FROM gastos WHERE id = ?`, id, function (err) {
-    if (err) {
-      console.error(err);
-    }
+  const { id } = req.params;
+  pool.query('DELETE FROM gastos WHERE id = $1', [id], (err) => {
+    if (err) console.error(err);
     res.redirect('/gastos');
   });
 });
 
 // Formulario editar
 router.get('/editar/:id', (req, res) => {
-  const id = req.params.id;
-  db.get('SELECT * FROM gastos WHERE id = ?', id, (err, gasto) => {
-    if (err) {
-      console.error(err);
-    } else {
-      res.render('editar', { gasto });
-    }
+  const { id } = req.params;
+  pool.query('SELECT * FROM gastos WHERE id = $1', [id], (err, result) => {
+    if (err) console.error(err);
+    res.render('editar', { gasto: result.rows[0] });
   });
 });
 
-// Actualizar gasto
+// Guardar cambios de edición
 router.post('/editar/:id', (req, res) => {
-  const id = req.params.id;
+  const { id } = req.params;
   const { descripcion, monto, categoria, fecha, tipo } = req.body;
-
-  db.run(`UPDATE gastos SET descripcion = ?, monto = ?, categoria = ?, fecha = ?, tipo = ? WHERE id = ?`,
+  pool.query(
+    'UPDATE gastos SET descripcion = $1, monto = $2, categoria = $3, fecha = $4, tipo = $5 WHERE id = $6',
     [descripcion, monto, categoria, fecha, tipo, id],
-    function (err) {
-      if (err) {
-        console.error(err);
-      }
+    (err) => {
+      if (err) console.error(err);
       res.redirect('/gastos');
-    });
+    }
+  );
 });
 
 module.exports = router;

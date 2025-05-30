@@ -1,16 +1,22 @@
-const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('./gastos.db');
+const { Pool } = require('pg');
 
-// Creamos tabla si no existe
-db.serialize(() => {
-  db.run(`CREATE TABLE IF NOT EXISTS gastos (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    descripcion TEXT,
-    monto REAL,
-    categoria TEXT,
-    fecha TEXT,
-    tipo TEXT
-  )`);
+// Conexión a la base de datos usando variable de entorno (Render)
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
 });
 
-module.exports = db;
+// Crear tabla si no existe
+pool.query(`CREATE TABLE IF NOT EXISTS gastos (
+  id SERIAL PRIMARY KEY,
+  descripcion TEXT,
+  monto REAL,
+  categoria TEXT,
+  fecha TEXT,
+  tipo TEXT
+)`, (err) => {
+  if (err) console.error('Error creando tabla', err);
+  else console.log('Tabla gastos lista');
+});
+
+module.exports = pool;
